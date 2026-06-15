@@ -254,7 +254,9 @@ export default function BattleCard({ battle, myId, onAccept, onLogScore }) {
   const daysLeft = start_date
     ? Math.max(0, duration_days - Math.floor((Date.now()-new Date(start_date)) / 86400000))
     : duration_days
-
+    const battleEnded = start_date
+    ? Math.floor((Date.now()-new Date(start_date)) / 86400000) >= duration_days
+    : false
   const statusMeta = {
     pending:   {color:'#f97316',label:'PENDING', tagClass:'tag-red'},
     active:    {color:'#00ff88',label:'ACTIVE',  tagClass:'tag-green'},
@@ -323,10 +325,13 @@ export default function BattleCard({ battle, myId, onAccept, onLogScore }) {
           {status==='pending' && iAmOpponent && (
             <button className="btn btn-success btn-sm" onClick={()=>onAccept(id)}>✓ Accept Challenge</button>
           )}
-          {status==='active' && myRole && (
+         {status==='active' && myRole && !battleEnded && (
             <button className="btn btn-primary btn-sm" onClick={()=>onLogScore(battle,myRole)}>
               📋 Log ITRs
             </button>
+          )}
+          {status==='active' && myRole && battleEnded && (
+            <span className="text-xs text-muted" style={{alignSelf:'center'}}>⏳ Battle duration ended — waiting for admin to mark complete</span>
           )}
           {status==='pending' && iAmChallenger && (
             <span className="text-xs text-muted" style={{alignSelf:'center'}}>⏳ Waiting for opponent to accept…</span>

@@ -283,19 +283,53 @@ export default function Leaderboard() {
       </div>
 
       <div className="card">
-        {/* Players tab */}
-        {tab === 'players' && (
-          <>
-            <div className="flex items-center justify-between mb2">
-              <h3 style={{ fontSize: 16, color: '#666', letterSpacing: 1 }}>TOP ITR FILLERS</h3>
-              <span className="text-xs text-muted">{players.length} players</span>
-            </div>
-            {players.length === 0
-              ? <p className="text-muted text-sm">No players yet.</p>
-              : players.map((p, i) => <PlayerRow key={p.id} player={p} rank={i + 1} />)
-            }
-          </>
-        )}
+   {/* Players tab */}
+   {tab === 'players' && (() => {
+          const rmPlayers = players
+            .filter(p => p.teams?.name === 'RM TEAM')
+            .sort((a,b) => (b.total_itrs||0) - (a.total_itrs||0))
+          const advisorPlayers = players
+            .filter(p => p.teams?.name === 'ADVISOR TEAM')
+            .sort((a,b) => (b.total_itrs||0) - (a.total_itrs||0))
+          const others = players
+            .filter(p => p.teams?.name !== 'RM TEAM' && p.teams?.name !== 'ADVISOR TEAM')
+            .sort((a,b) => (b.total_itrs||0) - (a.total_itrs||0))
+
+          return (
+            <>
+              <div className="flex items-center justify-between mb2">
+                <h3 style={{ fontSize: 16, color: '#666', letterSpacing: 1 }}>RM TEAM — TOP ITR FILLERS</h3>
+                <span className="text-xs text-muted">{rmPlayers.length} players</span>
+              </div>
+              {rmPlayers.length === 0
+                ? <p className="text-muted text-sm mb3">No RM players yet.</p>
+                : rmPlayers.map((p, i) => <PlayerRow key={p.id} player={p} rank={i + 1} />)
+              }
+
+              <div className="divider" style={{ margin: '1.5rem 0' }}/>
+
+              <div className="flex items-center justify-between mb2">
+                <h3 style={{ fontSize: 16, color: '#666', letterSpacing: 1 }}>ADVISOR TEAM — TOP ITR FILLERS</h3>
+                <span className="text-xs text-muted">{advisorPlayers.length} players</span>
+              </div>
+              {advisorPlayers.length === 0
+                ? <p className="text-muted text-sm mb3">No Advisor players yet.</p>
+                : advisorPlayers.map((p, i) => <PlayerRow key={p.id} player={p} rank={i + 1} />)
+              }
+
+              {others.length > 0 && (
+                <>
+                  <div className="divider" style={{ margin: '1.5rem 0' }}/>
+                  <div className="flex items-center justify-between mb2">
+                    <h3 style={{ fontSize: 16, color: '#666', letterSpacing: 1 }}>OTHER / NO TEAM</h3>
+                    <span className="text-xs text-muted">{others.length} players</span>
+                  </div>
+                  {others.map((p, i) => <PlayerRow key={p.id} player={p} rank={i + 1} />)}
+                </>
+              )}
+            </>
+          )
+        })()}
 
         {/* Teams tab */}
         {tab === 'teams' && (

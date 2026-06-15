@@ -829,8 +829,16 @@ export default function Battles() {
   async function handleLogScore() {
     const count = parseInt(itrVal)
     if (isNaN(count) || count < 0) return
-    setSaving(true)
     const { battle, role } = logModal
+    if (battle.start_date) {
+      const daysSinceStart = Math.floor((Date.now() - new Date(battle.start_date)) / 86400000)
+      if (daysSinceStart >= (battle.duration_days || 7)) {
+        alert('This battle\'s duration has ended. You can no longer log ITRs for it.')
+        return
+      }
+    }
+    setSaving(true)
+    
     const today = new Date().toISOString().slice(0,10)
     const dayNum = battle.start_date
       ? Math.floor((new Date(today) - new Date(battle.start_date)) / 86400000) + 1
