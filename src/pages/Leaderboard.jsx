@@ -81,7 +81,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { Avatar, TeamLogo, Spinner } from '../components/UI'
-
 const TABS = [
   { key: 'players', label: '👤 Players' },
   { key: 'teams',   label: '⚔ Teams' },
@@ -199,6 +198,7 @@ export default function Leaderboard() {
   const [players, setPlayers] = useState([])
   const [teams,   setTeams]   = useState([])
   const [loading, setLoading] = useState(true)
+  const [playerTeamTab, setPlayerTeamTab] = useState('RM TEAM')
 
   useEffect(() => {
     async function load() {
@@ -283,50 +283,33 @@ export default function Leaderboard() {
       </div>
 
       <div className="card">
-   {/* Players tab */}
-   {tab === 'players' && (() => {
-          const rmPlayers = players
-            .filter(p => p.teams?.name === 'RM TEAM')
-            .sort((a,b) => (b.total_itrs||0) - (a.total_itrs||0))
-          const advisorPlayers = players
-            .filter(p => p.teams?.name === 'ADVISOR TEAM')
-            .sort((a,b) => (b.total_itrs||0) - (a.total_itrs||0))
-          const others = players
-            .filter(p => p.teams?.name !== 'RM TEAM' && p.teams?.name !== 'ADVISOR TEAM')
+  {/* Players tab */}
+  {tab === 'players' && (() => {
+          const filtered = players
+            .filter(p => p.teams?.name === playerTeamTab)
             .sort((a,b) => (b.total_itrs||0) - (a.total_itrs||0))
 
           return (
             <>
               <div className="flex items-center justify-between mb2">
-                <h3 style={{ fontSize: 16, color: '#666', letterSpacing: 1 }}>RM TEAM — TOP ITR FILLERS</h3>
-                <span className="text-xs text-muted">{rmPlayers.length} players</span>
+                <h3 style={{ fontSize: 16, color: '#666', letterSpacing: 1 }}>TOP ITR FILLERS</h3>
+                <div className="flex gap1">
+                  {['RM TEAM','ADVISOR TEAM'].map(team => (
+                    <button
+                      key={team}
+                      className={`btn btn-sm ${playerTeamTab===team?'btn-primary':'btn-ghost'}`}
+                      onClick={()=>setPlayerTeamTab(team)}
+                      style={{fontSize:11}}
+                    >
+                      {team}
+                    </button>
+                  ))}
+                </div>
               </div>
-              {rmPlayers.length === 0
-                ? <p className="text-muted text-sm mb3">No RM players yet.</p>
-                : rmPlayers.map((p, i) => <PlayerRow key={p.id} player={p} rank={i + 1} />)
+              {filtered.length === 0
+                ? <p className="text-muted text-sm">No players in this team yet.</p>
+                : filtered.map((p, i) => <PlayerRow key={p.id} player={p} rank={i + 1} />)
               }
-
-              <div className="divider" style={{ margin: '1.5rem 0' }}/>
-
-              <div className="flex items-center justify-between mb2">
-                <h3 style={{ fontSize: 16, color: '#666', letterSpacing: 1 }}>ADVISOR TEAM — TOP ITR FILLERS</h3>
-                <span className="text-xs text-muted">{advisorPlayers.length} players</span>
-              </div>
-              {advisorPlayers.length === 0
-                ? <p className="text-muted text-sm mb3">No Advisor players yet.</p>
-                : advisorPlayers.map((p, i) => <PlayerRow key={p.id} player={p} rank={i + 1} />)
-              }
-
-              {others.length > 0 && (
-                <>
-                  <div className="divider" style={{ margin: '1.5rem 0' }}/>
-                  <div className="flex items-center justify-between mb2">
-                    <h3 style={{ fontSize: 16, color: '#666', letterSpacing: 1 }}>OTHER / NO TEAM</h3>
-                    <span className="text-xs text-muted">{others.length} players</span>
-                  </div>
-                  {others.map((p, i) => <PlayerRow key={p.id} player={p} rank={i + 1} />)}
-                </>
-              )}
             </>
           )
         })()}
