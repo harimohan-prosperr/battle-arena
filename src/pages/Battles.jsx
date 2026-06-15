@@ -323,8 +323,8 @@ export default function Battles() {
   const [itrVal,   setItrVal]   = useState('')
   const [saving,   setSaving]   = useState(false)
   const [statusFilter, setStatusFilter] = useState(location.state?.filter || 'all')
-  const [adminForm, setAdminForm] = useState({ challengerId:'', opponentId:'', wager:'', duration:7 })
-  const [playerForm, setPlayerForm] = useState({ opponentId:'', wager:'', duration:7 })
+  const [adminForm, setAdminForm] = useState({ challengerId:'', opponentId:'', wager:'', duration:1 })
+  const [playerForm, setPlayerForm] = useState({ opponentId:'', wager:'', duration:1 })
 
   const loadBattles = useCallback(async () => {
     // Auto-cancel expired pending battles
@@ -371,9 +371,10 @@ export default function Battles() {
         )
 
     // Sort: pending battles always last; everything else by created_at desc
+    const statusOrder = { active: 0, completed: 1, pending: 2, cancelled: 3 }
     const sorted = [...filtered].sort((a,b) => {
-      if (a.status==='pending' && b.status!=='pending') return 1
-      if (a.status!=='pending' && b.status==='pending') return -1
+      const orderDiff = (statusOrder[a.status] ?? 4) - (statusOrder[b.status] ?? 4)
+      if (orderDiff !== 0) return orderDiff
       return new Date(b.created_at) - new Date(a.created_at)
     })
 
@@ -453,7 +454,7 @@ export default function Battles() {
     setSaving(true)
     await createBattle(adminForm.challengerId, adminForm.opponentId, adminForm.duration, adminForm.wager)
     setSaving(false); setShowNew(false)
-    setAdminForm({ challengerId:'', opponentId:'', wager:'', duration:7 })
+    setAdminForm({ challengerId:'', opponentId:'', wager:'', duration:1 })
     loadBattles()
   }
 
@@ -462,7 +463,7 @@ export default function Battles() {
     setSaving(true)
     await createBattle(profile.id, playerForm.opponentId, playerForm.duration, playerForm.wager)
     setSaving(false); setShowNew(false)
-    setPlayerForm({ opponentId:'', wager:'', duration:7 })
+    setPlayerForm({ opponentId:'', wager:'', duration:1 })
     loadBattles()
   }
 
