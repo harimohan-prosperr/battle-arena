@@ -276,6 +276,10 @@ export default function BattleCard({ battle, myId, onAccept, onLogScore }) {
             <div style={{textAlign:'center',marginTop:8}}>
               <span className="tag tag-gold" style={{fontSize:11}}>🏆 {winnerName} wins</span>
             </div>
+          ) : status==='completed' ? (
+            <div style={{textAlign:'center',marginTop:8}}>
+              <span className="tag tag-gray" style={{fontSize:11}}>🤝 It's a draw — {cTotal} ITRs each</span>
+            </div>
           ) : (
             <p className="text-xs text-muted" style={{textAlign:'center',marginTop:6}}>
               {leaderName ? `${leaderName} leads by ${diff}` : total===0 ? 'No ITRs logged yet' : "It's a tie!"}
